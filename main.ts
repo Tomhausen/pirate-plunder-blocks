@@ -3,6 +3,7 @@ namespace SpriteKind {
     export const hitbox = SpriteKind.create()
     export const enemy_projectile = SpriteKind.create()
     export const port = SpriteKind.create()
+    export const minimap = SpriteKind.create()
 }
 function update_text () {
     treasure_text.setText(convertToText(treasure_onboard))
@@ -16,6 +17,15 @@ function make_projectile (source: Sprite, kind: number) {
     proj.setFlag(SpriteFlag.GhostThroughWalls, true)
     return proj
 }
+controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (minimap_open) {
+        minimap_sprite.setFlag(SpriteFlag.Invisible, true)
+        minimap_open = false
+    } else {
+        minimap_sprite.setFlag(SpriteFlag.Invisible, false)
+        minimap_open = true
+    }
+})
 sprites.onOverlap(SpriteKind.Player, SpriteKind.port, function (sprite, otherSprite) {
     info.changeScoreBy(treasure_onboard)
     treasure_onboard = 0
@@ -48,6 +58,14 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.hitbox, function (ship, treasure
     sprites.readDataSprite(treasure_hitbox, "treasure").destroy()
     treasure_hitbox.destroy()
 })
+function make_minimap () {
+    minimap_object = minimap.minimap(MinimapScale.Eighth, 2, 15)
+    minimap_image = minimap.getImage(minimap_object)
+    minimap_sprite = sprites.create(minimap_image, SpriteKind.minimap)
+    minimap_sprite.z = 10
+    minimap_sprite.setFlag(SpriteFlag.RelativeToCamera, true)
+    minimap_sprite.setFlag(SpriteFlag.Invisible, true)
+}
 function enemy_fire (fort: Sprite) {
     if (randint(1, 100) == 1 && spriteutils.distanceBetween(fort, ship) < 80) {
         proj = make_projectile(fort, SpriteKind.enemy_projectile)
@@ -142,12 +160,16 @@ let port_hitbox: Sprite = null
 let port_sprite: Sprite = null
 let treasure_hitbox: Sprite = null
 let treasure_sprite: Sprite = null
+let minimap_image: Image = null
+let minimap_object: minimap.Minimap = null
 let statusbar: StatusBarSprite = null
 let tile: tiles.Location = null
 let fort: Sprite = null
 let angle = 0
 let rotation = 0
+let minimap_sprite: Sprite = null
 let proj: Sprite = null
+let minimap_open = false
 let treasure_text: TextSprite = null
 let treasure_onboard = 0
 let ship: Sprite = null
@@ -169,6 +191,8 @@ treasure_text.z = 10
 treasure_text.setFlag(SpriteFlag.RelativeToCamera, true)
 update_text()
 make_ports()
+make_minimap()
+minimap_open = false
 game.onUpdate(function () {
     turn_ship()
     move()
@@ -184,5 +208,21 @@ game.onUpdateInterval(2000, function () {
     if (sprites.allOfKind(SpriteKind.Enemy).length < 10) {
         tile = tilesAdvanced.getAllWallTiles()._pickRandom()
         spawn_fort()
+    }
+})
+game.onUpdateInterval(100, function () {
+    if (minimap_open) {
+        minimap_object = minimap.minimap(MinimapScale.Eighth, 2, 15)
+        minimap.includeSprite(minimap_object, ship, MinimapSpriteScale.Double)
+        for (let value of sprites.allOfKind(SpriteKind.treasure)) {
+            minimap.includeSprite(minimap_object, value, MinimapSpriteScale.Double)
+        }
+        for (let value of sprites.allOfKind(SpriteKind.Enemy)) {
+            minimap.includeSprite(minimap_object, value, MinimapSpriteScale.Double)
+        }
+        for (let value of sprites.allOfKind(SpriteKind.port)) {
+            minimap.includeSprite(minimap_object, value, MinimapSpriteScale.Double)
+        }
+        minimap_sprite.setImage(minimap.getImage(minimap_object))
     }
 })
