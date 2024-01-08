@@ -4,6 +4,7 @@ namespace SpriteKind {
     export const enemy_projectile = SpriteKind.create()
     export const port = SpriteKind.create()
     export const minimap = SpriteKind.create()
+    export const pool = SpriteKind.create()
 }
 function update_text () {
     treasure_text.setText(convertToText(treasure_onboard))
@@ -46,6 +47,21 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.enemy_projectile, function (play
     cannon_ball.destroy()
     pause(1000)
 })
+function handle_whirlpool () {
+    if (spriteutils.distanceBetween(ship, whirlpool) < 100) {
+        if (whirlpool.x < ship.x) {
+            ship.vx += -15
+        } else {
+            ship.vx += 15
+        }
+        if (whirlpool.y < ship.y) {
+            ship.vy += -15
+        } else {
+            ship.vy += 15
+        }
+    }
+    transformSprites.changeRotation(whirlpool, 1)
+}
 function spawn_fort () {
     fort = sprites.create(assets.image`fort`, SpriteKind.Enemy)
     tiles.placeOnTile(fort, tile)
@@ -165,6 +181,7 @@ let minimap_object: minimap.Minimap = null
 let statusbar: StatusBarSprite = null
 let tile: tiles.Location = null
 let fort: Sprite = null
+let whirlpool: Sprite = null
 let angle = 0
 let rotation = 0
 let minimap_sprite: Sprite = null
@@ -186,7 +203,7 @@ transformSprites.rotateSprite(ship, 90)
 tiles.setCurrentTilemap(tilemap`level`)
 scene.cameraFollowSprite(ship)
 treasure_onboard = 0
-treasure_text = textsprite.create("")
+treasure_text = textsprite.create("", 1, 3)
 treasure_text.z = 10
 treasure_text.setFlag(SpriteFlag.RelativeToCamera, true)
 update_text()
@@ -196,6 +213,7 @@ minimap_open = false
 game.onUpdate(function () {
     turn_ship()
     move()
+    handle_whirlpool()
     for (let enemy of sprites.allOfKind(SpriteKind.Enemy)) {
         enemy_fire(enemy)
     }
@@ -225,4 +243,10 @@ game.onUpdateInterval(100, function () {
         }
         minimap_sprite.setImage(minimap.getImage(minimap_object))
     }
+})
+game.onUpdateInterval(20000, function () {
+    whirlpool = sprites.create(assets.image`whirlpool`, SpriteKind.pool)
+    tiles.placeOnTile(whirlpool, tiles.getTileLocation(6, 6))
+    whirlpool.lifespan = 10000
+    whirlpool.z = -1
 })

@@ -19,6 +19,11 @@
         "mimeType": "image/x-mkcd-f4",
         "displayName": "fort"
     },
+    "image3": {
+        "data": "hwQQABAAAAAAkJlhmZkJAACZGZaZmZkAkJkZlpmZmQmZmWGZmRmRmZmZYZmZYRaRmZkZlhmWaRaZmZlhYZmZaZmZmRmWmZmZmZmZaZGZmZmWmZkWFpmZmWGWaZFpkZmZGWEWmZkWmZmZGZGZmRaZmZCZmZlpkZkJAJmZmWmRmQAAkJmZFpkJAA==",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "whirlpool"
+    },
     "*": {
         "mimeType": "image/x-mkcd-f4",
         "dataEncoding": "base64",
