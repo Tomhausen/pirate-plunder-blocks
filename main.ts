@@ -246,7 +246,7 @@ game.onUpdateInterval(100, function () {
 })
 game.onUpdateInterval(20000, function () {
     whirlpool = sprites.create(assets.image`whirlpool`, SpriteKind.pool)
-    tiles.placeOnTile(whirlpool, tiles.getTileLocation(6, 6))
+    tiles.placeOnRandomTile(whirlpool, assets.tile`water`)
     whirlpool.lifespan = 10000
     whirlpool.z = -1
 })
